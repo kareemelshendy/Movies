@@ -4,45 +4,61 @@ import Link from "next/link"
 import CardDetails from "../../components/CardDetails"
 import { Movies, Page, Parmas } from "../../models"
 import styles from "../../styles/Card.module.css"
+import { useRouter } from "next/router"
+import useSWR from "swr"
+import { useMovie } from "../../hooks"
 
-export const getStaticPaths = async () => {
-  const res = await fetch("https://api.themoviedb.org/3/movie/popular?api_key=12534cc168a46c6bea58ae033e21d151&language=en-US&page=1")
-  const data: Page = await res.json()
-  const results = data.results
-  const paths = results.map((movie) => {
-    return {
-      params: { id: movie.id.toString() },
-    }
-  })
-  return {
-    paths,
-    fallback: false,
-  }
-}
-export const getStaticProps: GetStaticProps = async (context) => {
-  const params = context.params as Parmas
-  const res = await fetch(`https://api.themoviedb.org/3/movie/${params.id}?api_key=12534cc168a46c6bea58ae033e21d151&language=en-US`)
-  const data: Movies = await res.json()
-  if (!data) {
-    return {
-      redirect: {
-        destination: "/movies",
-        permanent: false,
-      },
-    }
-  }
-  return {
-    props: {
-      movie: data,
-    },
-  }
-}
+// export const getStaticPaths = async () => {
+//   const res = await fetch("https://api.themoviedb.org/3/movie/popular?api_key=12534cc168a46c6bea58ae033e21d151&language=en-US&page=1")
+//   const data: Page = await res.json()
+//   const results = data.results
+//   const paths = results.map((movie) => {
+//     return {
+//       params: { id: movie.id.toString() },
+//     }
+//   })
+//   return {
+//     paths,
+//     fallback: false,
+//   }
+// }
+// export const getStaticProps: GetStaticProps = async (context) => {
+//   const params = context.params as Parmas
+//   const res = await fetch(`https://api.themoviedb.org/3/movie/${params.id}?api_key=12534cc168a46c6bea58ae033e21d151&language=en-US`)
+//   const data: Movies = await res.json()
+//   if (!data) {
+//     return {
+//       redirect: {
+//         destination: "/movies",
+//         permanent: false,
+//       },
+//     }
+//   }
+//   return {
+//     props: {
+//       movie: data,
+//     },
+//   }
+// }
 
-function MovieDetails({ movie }: InferGetStaticPropsType<typeof getStaticProps>) {
+function MovieDetails() {
+  const router = useRouter()
+  const { id } = router.query
+  const { movie, isLoading } = useMovie(`https://api.themoviedb.org/3/movie/${id}?api_key=12534cc168a46c6bea58ae033e21d151&language=en-US`)
+
+  if (isLoading) {
+    return (
+      <div className="conteiner">
+        <div className="row">
+          <h1> Loading....</h1>
+        </div>
+      </div>
+    )
+  }
   return (
     <>
       <Head>
-        <title>Movies|{movie.title}</title>
+        <title>Movies|{movie?.title}</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossOrigin="anonymous" />
       </Head>
       <div className="container-fluid">

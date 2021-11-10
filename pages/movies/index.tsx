@@ -58,7 +58,6 @@ const Movies = ({ intialData }: InferGetStaticPropsType<typeof getStaticProps>) 
                 Previous
               </button>
             </li>
-
             {/* {movies?.results.map((item, index) => {
               return (
                 <li key={item.id} className={`page-item ${pageIndex === index + 1 ? "active" : ""}`}>
