@@ -5,7 +5,7 @@ import CardDetails from "../../components/CardDetails"
 import { Movies, Page, Parmas } from "../../models"
 import styles from "../../styles/Card.module.css"
 import { useRouter } from "next/router"
-import useSWR from "swr"
+
 import { useMovie } from "../../hooks"
 
 // export const getStaticPaths = async () => {
