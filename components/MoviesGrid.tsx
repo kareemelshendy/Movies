@@ -2,6 +2,8 @@ import { Movie, Page } from "../models"
 import { MoviesCards } from "./MoviesCards"
 
 export const MoviesGrid = (props:any) => {
+
+  console.log(props.movies)
   if (props.isLoading) {
     return (
       <div className="conteiner">
