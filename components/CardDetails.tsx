@@ -1,8 +1,7 @@
 import React from "react"
-import { Movies } from "../models"
+import { Movie } from "../models"
 import styles from "../styles/Card.module.css"
-
-function CardDetails({ movie }: { movie: Movies|undefined }) {
+function CardDetails({ movie }: { movie: Movie | undefined }) {
   return (
     <div className={`${styles.movie_card} mt-2`}>
       <img className={styles.movie_img} src={`https://image.tmdb.org/t/p/w400/${movie?.poster_path}`} alt="" />
@@ -17,7 +16,7 @@ function CardDetails({ movie }: { movie: Movies|undefined }) {
         </div>
         <div className={styles.movie_release}>
           <p>Released In : {movie?.release_date}</p>
-        <p className={styles.movie_reting}>rating : {movie?.vote_average}</p>
+          <p className={styles.movie_reting}>rating : {movie?.vote_average}</p>
         </div>
       </div>
     </div>

@@ -1,33 +1,29 @@
 import Head from "next/head"
 import { useMovies } from "../../hooks/index"
-import { GetStaticProps, InferGetStaticPropsType } from "next"
-import { Page } from "../../models"
+import { GetServerSideProps, GetServerSidePropsResult, GetStaticProps, InferGetServerSidePropsType, InferGetStaticPropsType } from "next"
+import { Page, Parmas } from "../../models"
 import { MoviesCards } from "../../components/MoviesCards"
 import { useState } from "react"
+import { Router, useRouter } from "next/router"
 
-export const getStaticProps: GetStaticProps = async () => {
-  const res = await fetch("https://api.themoviedb.org/3/movie/popular?api_key=12534cc168a46c6bea58ae033e21d151&language=en-US&page=1")
+import Link from "next/link"
+import MoviesHOC from "../../higherOrderComponents/movies-hoc"
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const query = context.query
+  const res = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=12534cc168a46c6bea58ae033e21d151&language=en-US&page=${!query.page ? 1 : query.page}`)
   const data: Page = await res.json()
-
   return {
     props: {
       intialData: data,
     },
   }
 }
-const Movies = ({ intialData }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const [pageIndex, setPageIndex] = useState(1)
-  const { movies, isLoading } = useMovies(`https://api.themoviedb.org/3/movie/popular?api_key=12534cc168a46c6bea58ae033e21d151&language=en-US&page=${pageIndex}`, intialData)
-  // console.log(movies)
-  if (isLoading) {
-    return (
-      <div className="conteiner">
-        <div className="row">
-          <h1> Loading....</h1>
-        </div>
-      </div>
-    )
-  }
+const Movies = ({ intialData }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter()
+  const page: string = router.query?.page as string
+  const [pageIndex, setPageIndex] = useState(+page || 1)
+
   return (
     <>
       <Head>
@@ -36,56 +32,36 @@ const Movies = ({ intialData }: InferGetStaticPropsType<typeof getStaticProps>) 
       </Head>
       <div>
         <h2 className="text-center mt-3">Populer Movies</h2>
-        <div className="container-fluid mt-5 mb-5">
-          <div className="row text-center">
-            {movies?.results.map((movie) => {
-              return <MoviesCards key={movie.id} movie={movie} />
-            })}
-          </div>
-        </div>
+        <MoviesHOC pageIndex={page} intialPage={intialData} />
       </div>
       <div>
         <nav aria-label="Page navigation ">
           <ul className="pagination justify-content-center">
-            <li className={`page-item ${pageIndex === 1 ? "disabled" : ""} `}>
-              <button
-                onClick={() => {
-                  setPageIndex(pageIndex - 1)
-                  window.scroll(0, 0)
-                }}
-                className="page-link"
-              >
-                Previous
-              </button>
+            <li className={`page-item ${!pageIndex || +pageIndex === 1 ? "disabled" : ""} mr-2`}>
+              <Link href={`/movies?page=${pageIndex ? +pageIndex - 1 : 1}`}>
+                <a
+                  onClick={() => {
+                    setPageIndex(+pageIndex - 1)
+                    window.scroll(0, 0)
+                  }}
+                  className="page-link"
+                >
+                  Previous
+                </a>
+              </Link>
             </li>
-            {/* {movies?.results.map((item, index) => {
-              return (
-                <li key={item.id} className={`page-item ${pageIndex === index + 1 ? "active" : ""}`}>
-                  <button
-                    onClick={() => {
-                      setPageIndex(index + 1)
-                      window.scroll(0, 0)
-                    }}
-                    className="page-link"
-                  >
-                    {index + 1}
-                  </button>
-                </li>
-              )
-            })} */}
-            <li className={`page-item `}>
-              <button className="page-link">{pageIndex}</button>
-            </li>
-            <li className={`page-item ${pageIndex === 500 ? "disabled" : ""}`}>
-              <button
-                onClick={() => {
-                  setPageIndex(pageIndex + 1)
-                  window.scroll(0, 0)
-                }}
-                className="page-link"
-              >
-                Next
-              </button>
+            <li className={`page-item ${pageIndex && +pageIndex === 500 ? "disabled" : ""}`}>
+              <Link href={`/movies?page=${pageIndex ? +pageIndex + 1 : 2} `}>
+                <a
+                  onClick={() => {
+                    setPageIndex(+pageIndex + 1)
+                    window.scroll(0, 0)
+                  }}
+                  className="page-link"
+                >
+                  Next
+                </a>
+              </Link>
             </li>
           </ul>
         </nav>

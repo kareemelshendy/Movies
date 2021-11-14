@@ -1,27 +1,11 @@
 import useSWR from "swr"
-import { Movies, Page } from "../models"
+import { Page } from "../models"
 
-export const useMovies = (url: string, fallbackData: Page) => {
-  const { data, error } = useSWR<Page>(url, async () => {
-    const res = await fetch(url)
-    return res.json()
-  })
+export const useMovies = (pageIndex: string, fallbackData: Page) => {
+  const { data, error } = useSWR<Page>(`https://api.themoviedb.org/3/movie/popular?api_key=12534cc168a46c6bea58ae033e21d151&language=en-US&page=${pageIndex}`, { fallbackData })
 
   return {
     movies: data,
-    isLoading: !data && !error,
-    isError: error,
-  }
-}
-
-export const useMovie = (url: string) => {
-  const { data, error } = useSWR<Movies>(url, async () => {
-    const res = await fetch(url)
-    return res.json()
-  })
-
-  return {
-    movie: data,
     isLoading: !data && !error,
     isError: error,
   }

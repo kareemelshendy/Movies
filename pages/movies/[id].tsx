@@ -2,11 +2,10 @@ import { GetStaticProps, InferGetStaticPropsType } from "next"
 import Head from "next/head"
 import Link from "next/link"
 import CardDetails from "../../components/CardDetails"
-import { Movies, Page, Parmas } from "../../models"
 import styles from "../../styles/Card.module.css"
 import { useRouter } from "next/router"
-
 import { useMovie } from "../../hooks"
+import { Parmas } from "../../models/params"
 
 // export const getStaticPaths = async () => {
 //   const res = await fetch("https://api.themoviedb.org/3/movie/popular?api_key=12534cc168a46c6bea58ae033e21d151&language=en-US&page=1")
@@ -19,19 +18,17 @@ import { useMovie } from "../../hooks"
 //   })
 //   return {
 //     paths,
-//     fallback: false,
+//     fallback: true,
 //   }
-// }
+// // }
 // export const getStaticProps: GetStaticProps = async (context) => {
 //   const params = context.params as Parmas
 //   const res = await fetch(`https://api.themoviedb.org/3/movie/${params.id}?api_key=12534cc168a46c6bea58ae033e21d151&language=en-US`)
 //   const data: Movies = await res.json()
-//   if (!data) {
+
+//   if (!data.id) {
 //     return {
-//       redirect: {
-//         destination: "/movies",
-//         permanent: false,
-//       },
+//       notFound: true,
 //     }
 //   }
 //   return {
@@ -44,8 +41,10 @@ import { useMovie } from "../../hooks"
 function MovieDetails() {
   const router = useRouter()
   const { id } = router.query
-  const { movie, isLoading } = useMovie(`https://api.themoviedb.org/3/movie/${id}?api_key=12534cc168a46c6bea58ae033e21d151&language=en-US`)
-
+  const { movie, isLoading, isError } = useMovie(id as string)
+  if (isError) {
+    return <p>nofound</p>
+  }
   if (isLoading) {
     return (
       <div className="conteiner">
